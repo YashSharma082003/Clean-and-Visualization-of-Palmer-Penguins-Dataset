@@ -1,0 +1,177 @@
+---
+title: "Clean and Visualization of Palmer Penguins Dataset"
+author: "By Yash Sharma"
+date: ''
+output: html_document
+---
+
+# Introduction
+This is an exploratory analysis of [The Palmer Penguins Dataset from ASHWANI RATHEE on Kaggle](https://www.kaggle.com/datasets/ashkhagan/palmer-penguins-datasetalternative-iris-dataset).  
+
+Data were collected and made available by Dr. Kristen Gorman and the Palmer Station, Antarctica LTER, a member of the Long Term Ecological Research Network.
+
+# Palmer Penguins Dataset
+
+## Setting up my environment
+Notes: Setting up my environment by load libraries of `tidyverse` and `palmerpenguins` packages:
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+## Inspect & Clean Data
+For Preview the dataset we use the `head()` function which returns the columns and first several rows of data:
+
+```{r}
+head(penguins)
+```
+
+In addition to `head()` function there are few several function for preview the dataset. for example `str()` function will provide summaries of each column in your data arranged horizontally:
+
+```{r}
+str(penguins)
+```
+In addition to `str()` function there are few several function for preview the dataset. for example `glimpse()` function will provide summaries of each columns:
+
+```{r}
+glimpse(penguins)
+```
+
+To find out what columns I have in our data frame. `colnames()` function help to preview the columns names in our dataset:
+
+```{r}
+colnames(penguins)
+```
+
+## Manipulating our Data
+Filter our dataset which contains only `Adelie` species 
+
+```{r}
+filter(penguins, species == "Adelie")
+```
+
+Arrange our dataset in descending order
+
+```{r}
+arrange(penguins, -bill_length_mm)
+```
+
+Now we want to group species in our dataset for this we use `group_by()` function to group species:
+
+```{r}
+group_by(penguins,species)
+```
+
+If we want to filter,arrange and group_by our dataset with one line of code than we use pipe function that help our to filter,arrange and group_by our dataset at one time:
+
+```{r}
+penguins %>%
+filter(island == "Torgersen") %>%
+arrange(-bill_length_mm) %>%
+group_by(species)
+```
+
+Now, we use `drop_na()` function to eliminate blank cells in our dataset:
+
+```{r}
+penguins %>%
+filter(island == "Torgersen") %>%
+arrange(-bill_length_mm) %>%
+group_by(species) %>%
+drop_na()
+```
+
+To create new variables in your data frame, we can use the `mutate()` function. This will make changes to the data frame, but not to the original data set you imported. That source data will remain unchanged:
+
+```{r}
+penguins %>%
+filter(island == "Torgersen") %>%
+arrange(-bill_length_mm) %>%
+group_by(species) %>%
+drop_na() %>%
+mutate(flipper_length_m = flipper_length_mm / 1000)
+```
+
+Now, we use `select()` funtion to select fwe columns from our dataset:
+
+```{r}
+penguins %>%
+select(species,island,bill_length_mm,flipper_length_mm) %>%
+filter(island == "Torgersen") %>%
+arrange(-bill_length_mm) %>%
+group_by(species) %>%
+drop_na()
+```
+
+Now, we use `summariize()` function for summarize our data eg: max,min,average,standard deviation of flipper length:
+
+```{r}
+penguins %>%
+drop_na() %>%
+summarize(maximum=max(flipper_length_mm),
+          minimum=min(flipper_length_mm),
+          average=mean(flipper_length_mm),
+          standard_deviation=sd(flipper_length_mm))
+```
+
+## Visualizations
+Here we will go through a series of visualizations (scatter plot,smooth line,jitter plot,line,violin,boxplot,bar,histogram) :-
+
+### Flipper and Body Mass 
+Here, we plot flipper length against body mass(except in bar and histogram chart):
+
+```{r}
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_point(color="purple")
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_smooth(method="loess",color="purple")
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_jitter(color="purple")
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_line(fill="black")
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_violin(fill="black")
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_boxplot()
+ggplot(data=penguins,aes(x=flipper_length_mm)) + geom_bar(color="purple")
+ggplot(data=penguins,aes(x=flipper_length_mm)) + geom_histogram(color="purple")
+```
+
+### Flipper and body mass by species
+Here, we plot flipper length against body mass and look at the breakdown by species(except in bar and histogram chart):
+
+```{r}
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_point(aes(shape=species))
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_smooth(method="loess")
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_jitter(aes(shape=species))
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_line(aes(shape=species))
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_violin(aes(shape=species,fill=species))
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_boxplot(aes(shape=species))
+ggplot(data=penguins,aes(x=flipper_length_mm)) + geom_bar(aes(shape=species,color=species))
+ggplot(data=penguins,aes(x=flipper_length_mm)) + geom_histogram(aes(shape=species))
+```
+
+### Flipper and body mass by species and sex
+Here, we plot flipper length against body mass and look at the breakdown by species and sex(except in bar and histogram chart):
+
+```{r}
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_point(aes(color=species,shape=species)) + facet_wrap(~sex)
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_smooth(method= "loess",aes(color=species)) + facet_wrap(~sex)
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_jitter(aes(color=species,shape=species)) + facet_wrap(~sex)
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_line(aes(color=species,shape=species)) + facet_wrap(~sex)
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_violin(aes(color=species,shape=species,fill=species)) + facet_wrap(~sex)
+ggplot(data=penguins,aes(x=flipper_length_mm,y=body_mass_g)) + geom_boxplot(aes(color=species,shape=species)) + facet_wrap(~sex)
+ggplot(data=penguins,aes(x=flipper_length_mm)) + geom_bar(aes(shape=species,color=species)) + facet_wrap(~sex)
+ggplot(data=penguins,aes(x=flipper_length_mm)) + geom_histogram(aes(shape=species,color=species)) + facet_wrap(~sex)
+```
+
+
+### Add Title, Subtitle and Caption 
+Now, we add a descriptive title, subtitle and Caption to our plot(except in bar and histogram chart):
+
+```{r}
+ggplot(data=penguins)+geom_point(mapping=aes(x=flipper_length_mm,y=body_mass_g,shape=species,color=species))+ labs(title="Palmer_Penguins:Flipper_Length_VS_Body_Mass", subtitle="Three Penguins Species", caption = "Created By Yash Sharma")
+ggplot(data=penguins)+geom_smooth(method="loess",mapping=aes(x=flipper_length_mm,y=body_mass_g,color=species)) + labs(title="Palmer_Penguins:Flipper_Length_VS_Body_Mass", subtitle="Three Penguins Species", caption = "Created By Yash Sharma")
+ggplot(data=penguins)+geom_jitter(mapping=aes(x=flipper_length_mm,y=body_mass_g,shape=species,color=species))+ labs(title="Palmer_Penguins:Flipper_Length_VS_Body_Mass", subtitle="Three Penguins Species", caption = "Created By Yash Sharma")
+ggplot(data=penguins)+geom_line(mapping=aes(x=flipper_length_mm,y=body_mass_g,color=species)) + labs(title="Palmer_Penguins:Flipper_Length_VS_Body_Mass", subtitle="Three Penguins Species", caption = "Created By Yash Sharma")
+ggplot(data=penguins)+geom_violin(mapping=aes(x=flipper_length_mm,y=body_mass_g,shape=species,fill=species)) + labs(title="Palmer_Penguins:Flipper_Length_VS_Body_Mass", subtitle="Three Penguins Species", caption = "Created By Yash Sharma")
+ggplot(data=penguins)+geom_boxplot(mapping=aes(x=flipper_length_mm,y=body_mass_g,color=species)) +labs(title="Palmer_Penguins:Flipper_Length_VS_Body_Mass", subtitle="Three Penguins Species", caption = "Created By Yash Sharma")
+ggplot(data=penguins)+geom_bar(mapping=aes(x=flipper_length_mm,color=species)) + labs(title="Palmer_Penguins:Flipper_Length_VS_Body_Mass", subtitle="Three Penguins Species", caption = "Created By Yash Sharma")
+ggplot(data=penguins)+geom_histogram(mapping=aes(x=flipper_length_mm,color=species)) +labs(title="Palmer_Penguins:Flipper_Length_VS_Body_Mass", subtitle="Three Penguins Species", caption = "Created By Yash Sharma")
+```
+
